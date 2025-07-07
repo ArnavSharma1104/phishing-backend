@@ -17,7 +17,11 @@ const FakeLoginAttempt = require("./models/FakeLoginAttempt");
 const app = express(); // ✅ Move this ABOVE any app.use()!
 
 // Middleware
-app.use(cors({ origin: "http://localhost:3000" }));
+app.use(cors({
+  origin: ["http://localhost:3000", "https://sa.careervite.in"],
+  credentials: true
+}));
+
 app.use(express.json());
 
 // ✅ Route Mounting (AFTER app is declared)
