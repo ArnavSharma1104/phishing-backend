@@ -11,8 +11,11 @@ router.post("/", async (req, res) => {
     if (!template) return res.status(404).json({ error: "Template not found" });
 
     // Replace {{email}} in template
-    const encodedEmail = encodeURIComponent(to); // 👈 Encode special characters like @
-    const htmlBody = template.body.replace(/{{email}}/g, encodedEmail);
+    const encodedEmail = encodeURIComponent(to); // to = recipient email
+    const htmlBody = template.body
+        .replace(/{{email}}/g, to) // for greeting (plain)
+        .replace('source={{email}}', `source=${encodedEmail}`); // encode only in URL
+
 
 
     // Nodemailer transporter
