@@ -18,9 +18,14 @@ const app = express(); // ✅ Move this ABOVE any app.use()!
 
 // Middleware
 app.use(cors({
-  origin: ["http://localhost:3000", "https://sa.careervite.in"],
+  origin: [
+    "http://localhost:3000",
+    "https://sa.careervite.in",
+    "https://phishing-frontend-mu.vercel.app"
+  ],
   credentials: true
 }));
+
 
 app.use(express.json());
 
