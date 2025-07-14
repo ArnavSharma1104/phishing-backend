@@ -18,8 +18,15 @@ const fakeLoginRoutes = require("./routes/fakeLoginRoutes");
 const app = express();
 
 // ====== MIDDLEWARE ======
-app.use(cors({ origin: "http://localhost:3000" }));
-app.use(express.json());
+const cors = require("cors");
+
+app.use(cors({
+  origin: [
+    "http://localhost:3000", // local frontend
+    "https://phishing-portal.vercel.app" // live frontend
+  ]
+}));
+
 
 // ====== ROUTES ======
 app.use("/api/send-email", sendEmailRoutes);
