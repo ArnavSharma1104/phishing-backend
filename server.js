@@ -1,38 +1,37 @@
+// server.js
+
 require("dotenv").config();
 
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+
+// Models
 const EmailTemplate = require("./models/EmailTemplate");
-const sendEmailRoutes = require("./routes/sendEmail");
-const templateRoutes = require("./routes/templateRoutes");
-const { configDotenv } = require("dotenv");
-const fakeLoginRoutes = require("./routes/fakeLoginRoutes");
 const FakeLoginAttempt = require("./models/FakeLoginAttempt");
 
+// Routes
+const sendEmailRoutes = require("./routes/sendEmail");
+const templateRoutes = require("./routes/templateRoutes");
+const fakeLoginRoutes = require("./routes/fakeLoginRoutes");
 
+const app = express();
 
-
-
-const app = express(); // ✅ Move this ABOVE any app.use()!
-
-// Middleware
+// ====== MIDDLEWARE ======
 app.use(cors({ origin: "http://localhost:3000" }));
 app.use(express.json());
 
-// ✅ Route Mounting (AFTER app is declared)
+// ====== ROUTES ======
 app.use("/api/send-email", sendEmailRoutes);
 app.use("/api/templates", templateRoutes);
-
-//Fake Login Routes
 app.use("/api/fake-login", fakeLoginRoutes);
 
-// Test Route
+// ====== TEST ROUTE ======
 app.get("/", (req, res) => {
   res.send("✅ Phishing Portal backend is running!");
 });
 
-// Activity Schema
+// ====== ACTIVITY LOGGING ======
 const activitySchema = new mongoose.Schema({
   email: String,
   action: String,
@@ -43,20 +42,21 @@ const activitySchema = new mongoose.Schema({
 });
 const Activity = mongoose.model("Activity", activitySchema);
 
-// Log Activity
+// Log new activity
 app.post("/api/activity/log", async (req, res) => {
   const { email, action } = req.body;
+
   try {
     const activity = new Activity({ email, action });
     await activity.save();
     res.status(200).json({ message: "✅ Activity logged!" });
   } catch (err) {
-    console.error("Error saving activity:", err);
+    console.error("❌ Error saving activity:", err);
     res.status(500).json({ error: "❌ Failed to log activity" });
   }
 });
 
-// Get All Logs
+// Get all logs
 app.get("/api/activity/logs", async (req, res) => {
   try {
     const logs = await Activity.find().sort({ timestamp: -1 });
@@ -67,7 +67,7 @@ app.get("/api/activity/logs", async (req, res) => {
   }
 });
 
-// Delete a Log
+// Delete a specific log
 app.delete("/api/activity/logs/:id", async (req, res) => {
   try {
     const { id } = req.params;
@@ -79,7 +79,7 @@ app.delete("/api/activity/logs/:id", async (req, res) => {
   }
 });
 
-// Create Template (Optional - also handled in routes/templateRoutes)
+// ====== OPTIONAL TEMPLATE CREATION ROUTE (if not handled in templateRoutes) ======
 app.post("/api/templates/create", async (req, res) => {
   const { title, subject, body } = req.body;
 
@@ -93,10 +93,9 @@ app.post("/api/templates/create", async (req, res) => {
   }
 });
 
-//fake login capture
-// Add this to server.js or use it from a separate route file
+// ====== FAKE LOGIN CAPTURE (if not handled inside fakeLoginRoutes) ======
 app.post("/api/fake-login", async (req, res) => {
-  const { email, password, clickedFrom } = req.body; // ✅ FIXED
+  const { email, password, clickedFrom } = req.body;
 
   try {
     const attempt = new FakeLoginAttempt({ email, password, clickedFrom });
@@ -108,8 +107,7 @@ app.post("/api/fake-login", async (req, res) => {
   }
 });
 
-
-// GET all fake login attempts
+// Get all fake login attempts
 app.get("/api/fake-login", async (req, res) => {
   try {
     const attempts = await FakeLoginAttempt.find().sort({ timestamp: -1 });
@@ -120,9 +118,7 @@ app.get("/api/fake-login", async (req, res) => {
   }
 });
 
-
-
-// DB Connection
+// ====== CONNECT TO MONGODB ======
 mongoose
   .connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
@@ -131,7 +127,7 @@ mongoose
   .then(() => console.log("✅ Connected to MongoDB Atlas"))
   .catch((err) => console.error("❌ MongoDB connection error:", err));
 
-// Start Server
+// ====== START SERVER ======
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
   console.log(`🚀 Server is listening on port ${PORT}`);
