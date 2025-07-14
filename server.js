@@ -26,6 +26,8 @@ app.use(cors({
     "https://phishing-portal.vercel.app" // live frontend
   ]
 }));
+app.use(express.json()); // must be present BEFORE routes
+
 
 
 // ====== ROUTES ======
