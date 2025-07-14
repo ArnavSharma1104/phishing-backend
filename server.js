@@ -23,7 +23,8 @@ const app = express();
 app.use(cors({
   origin: [
     "http://localhost:3000", // local frontend
-    "https://phishing-portal.vercel.app" // live frontend
+    "https://phishing-portal.vercel.app",
+    "https://sa.careervite.in" // live frontend
   ]
 }));
 app.use(express.json()); // must be present BEFORE routes
