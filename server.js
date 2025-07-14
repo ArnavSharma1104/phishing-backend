@@ -18,7 +18,7 @@ const fakeLoginRoutes = require("./routes/fakeLoginRoutes");
 const app = express();
 
 // ====== MIDDLEWARE ======
-const cors = require("cors");
+//const cors = require("cors");
 
 app.use(cors({
   origin: [
